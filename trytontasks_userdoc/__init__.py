@@ -2,10 +2,12 @@
 #this repository contains the full copyright notices and license terms.
 import os
 import glob
+import webbrowser
 from invoke import task, run
 from blessings import Terminal
 from path import path
 from string import Template
+from trytontasks_modules import read_config_file
 
 t = Terminal()
 
@@ -96,3 +98,18 @@ def build(source_doc='doc-src', doc_path="doc", buildername='html'):
     run(cmd)
 
     print t.bold('Done')
+
+@task
+def open(server):
+    'Open User DOC in browser'
+    Servers = read_config_file('servers.cfg', type='servers')
+    servers = Servers.sections()
+    servers.sort()
+
+    if not server in servers:
+        print 'Not found %s' % server
+        return
+
+    url = Servers.get(server, 'doc')
+    if url:
+        webbrowser.open(url, new=1)
